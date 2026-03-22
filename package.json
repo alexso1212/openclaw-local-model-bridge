@@ -1,0 +1,32 @@
+{
+  "name": "openclaw-local-model-bridge",
+  "version": "1.0.0",
+  "description": "OpenClaw local bridge for Codex, Claude Code, and Gemini CLI accounts",
+  "author": "Alex",
+  "homepage": "https://github.com/alexso1212/openclaw-local-model-bridge",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexso1212/openclaw-local-model-bridge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alexso1212/openclaw-local-model-bridge/issues"
+  },
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "status": "node bridge-status.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "openclaw",
+    "bridge",
+    "codex",
+    "claude",
+    "gemini"
+  ],
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

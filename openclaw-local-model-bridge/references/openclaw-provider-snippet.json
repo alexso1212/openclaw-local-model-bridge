@@ -1,0 +1,61 @@
+{
+  "models": {
+    "providers": {
+      "local-cli-bridge": {
+        "baseUrl": "http://127.0.0.1:3099/v1",
+        "apiKey": "local",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "gpt-5.1-codex-max",
+            "name": "Codex Max / GPT-5.1-Codex-Max",
+            "reasoning": false,
+            "input": ["text"],
+            "contextWindow": 256000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "gpt-5.4",
+            "name": "Codex Pro / GPT-5.4",
+            "reasoning": false,
+            "input": ["text"],
+            "contextWindow": 256000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "claude-sonnet-4-5",
+            "name": "Claude Code Local Bridge",
+            "reasoning": false,
+            "input": ["text"],
+            "contextWindow": 200000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "claude-opus-4-6",
+            "name": "Claude Code Opus 4.6 Local Bridge",
+            "reasoning": false,
+            "input": ["text"],
+            "contextWindow": 200000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "gemini-2.5-pro",
+            "name": "Gemini CLI Pro Local Bridge",
+            "reasoning": false,
+            "input": ["text"],
+            "contextWindow": 1000000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "gemini-2.5-flash",
+            "name": "Gemini CLI Local Bridge",
+            "reasoning": false,
+            "input": ["text"],
+            "contextWindow": 1000000,
+            "maxTokens": 8192
+          }
+        ]
+      }
+    }
+  }
+}

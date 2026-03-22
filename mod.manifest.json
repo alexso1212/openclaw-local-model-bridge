@@ -1,0 +1,15 @@
+{
+  "id": "openclaw-local-model-bridge",
+  "name": "OpenClaw Local Model Bridge",
+  "kind": "bridge-mod",
+  "entry": {
+    "service": "server.js",
+    "status": "bridge-status.js"
+  },
+  "integrations": {
+    "openclawSkillDir": "openclaw-local-model-bridge",
+    "providerSnippet": "openclaw-local-model-bridge/references/openclaw-provider-snippet.json"
+  },
+  "modelsSource": "dynamic",
+  "catalogSource": "bridge-status"
+}
