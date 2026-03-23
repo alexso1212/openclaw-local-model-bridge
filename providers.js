@@ -10,9 +10,11 @@ const BUILTIN_MODELS = [
 ];
 
 const MODEL_ALIASES = new Map([
+  ['codex-pro', 'gpt-5.4'],
   ['codex-cli/gpt-5.4', 'gpt-5.4'],
   ['codex-bridge/codex-pro', 'gpt-5.4'],
   ['openai-codex/gpt-5.4', 'gpt-5.4'],
+  ['claude-max', 'claude-sonnet-4-5'],
   ['local-cli-bridge/claude-sonnet-4-5', 'claude-sonnet-4-5'],
   ['local-cli-bridge/claude-opus-4-6', 'claude-opus-4-6'],
   ['local-cli-bridge/gemini-2.5-pro', 'gemini-2.5-pro'],

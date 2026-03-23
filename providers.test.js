@@ -41,8 +41,26 @@ test('resolveProviderModel normalizes old codex-bridge ids', () => {
   });
 });
 
+test('resolveProviderModel normalizes raw codex-pro ids from legacy bridge clients', () => {
+  const result = resolveProviderModel('codex-pro', 'claude-sonnet-4-5');
+
+  assert.deepEqual(result, {
+    provider: 'codex',
+    model: 'gpt-5.4'
+  });
+});
+
 test('resolveProviderModel routes claude models to the claude provider', () => {
   const result = resolveProviderModel('claude-sonnet-4-5', 'claude-sonnet-4-5');
+
+  assert.deepEqual(result, {
+    provider: 'claude',
+    model: 'claude-sonnet-4-5'
+  });
+});
+
+test('resolveProviderModel normalizes raw claude-max ids from legacy bridge clients', () => {
+  const result = resolveProviderModel('claude-max', 'claude-sonnet-4-5');
 
   assert.deepEqual(result, {
     provider: 'claude',

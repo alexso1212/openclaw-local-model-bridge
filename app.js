@@ -56,15 +56,34 @@ function createApp(options = {}) {
   const config = options.config || loadConfig();
   const spawn = options.spawn || defaultSpawn;
   const detect = options.detectProviders || (() => detectProviders(config));
+  const providerStatusTtlMs = Number.isFinite(config.providerStatusTtlMs)
+    ? config.providerStatusTtlMs
+    : 30000;
+  const providerStatusCache = {
+    expiresAt: 0,
+    value: null
+  };
 
   const app = express();
   app.use(express.json({ limit: '10mb' }));
+
+  function getProviderStatus() {
+    const now = Date.now();
+    if (providerStatusCache.value && now < providerStatusCache.expiresAt) {
+      return providerStatusCache.value;
+    }
+
+    const value = detect();
+    providerStatusCache.value = value;
+    providerStatusCache.expiresAt = now + providerStatusTtlMs;
+    return value;
+  }
 
   app.get('/health', (req, res) => {
     res.json({
       status: 'ok',
       default_model: config.defaultModel,
-      providers: detect()
+      providers: getProviderStatus()
     });
   });
 

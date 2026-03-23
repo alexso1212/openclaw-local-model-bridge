@@ -101,6 +101,39 @@ test('GET /health reports provider availability', async () => {
   }
 });
 
+test('GET /health reuses recent provider detection results instead of re-checking every request', async () => {
+  let detectCalls = 0;
+  const app = createApp({
+    config: {
+      defaultModel: 'claude-sonnet-4-5',
+      providerStatusTtlMs: 60000
+    },
+    detectProviders: () => {
+      detectCalls += 1;
+      return {
+        codex: { available: true },
+        claude: { available: true },
+        gemini: { available: true }
+      };
+    },
+    spawn: () => {
+      throw new Error('spawn should not be called');
+    }
+  });
+  const server = await startServer(app);
+
+  try {
+    const first = await request(server, { method: 'GET', path: '/health' });
+    const second = await request(server, { method: 'GET', path: '/health' });
+
+    assert.equal(first.statusCode, 200);
+    assert.equal(second.statusCode, 200);
+    assert.equal(detectCalls, 1);
+  } finally {
+    server.close();
+  }
+});
+
 test('POST /v1/chat/completions routes non-streaming Codex requests', async () => {
   const calls = [];
   const spawn = (command, args, options) => {

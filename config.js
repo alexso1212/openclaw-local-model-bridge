@@ -11,7 +11,8 @@ function loadConfig(env = process.env) {
     claudePath: env.CLAUDE_PATH || 'claude',
     geminiPath: env.GEMINI_PATH || 'gemini',
     claudePermissionMode: env.CLAUDE_PERMISSION_MODE || 'bypassPermissions',
-    requestTimeoutMs: Number.parseInt(env.REQUEST_TIMEOUT_MS || '300000', 10)
+    requestTimeoutMs: Number.parseInt(env.REQUEST_TIMEOUT_MS || '300000', 10),
+    providerStatusTtlMs: Number.parseInt(env.PROVIDER_STATUS_TTL_MS || '30000', 10)
   };
 }
 
