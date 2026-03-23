@@ -77,6 +77,7 @@ function createApp(options = {}) {
 
   app.post('/v1/chat/completions', (req, res) => {
     const { messages = [], stream = false } = req.body;
+    let clientClosed = false;
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({
@@ -144,9 +145,17 @@ function createApp(options = {}) {
       if (proc && !proc.killed) proc.kill();
     }
 
-    req.on('aborted', killProcess);
+    function canRespond() {
+      return !clientClosed && !req.aborted && !res.destroyed && !res.writableEnded;
+    }
+
+    req.on('aborted', () => {
+      clientClosed = true;
+      killProcess();
+    });
     res.on('close', () => {
       if (!res.writableEnded) killProcess();
+      clientClosed = true;
     });
 
     if (stream) {
@@ -163,7 +172,7 @@ function createApp(options = {}) {
 
       for (const line of lines) {
         const text = handleLine(line);
-        if (!stream || !text) continue;
+        if (!stream || !text || !canRespond()) continue;
 
         const payload = {
           id: requestId,
@@ -181,6 +190,8 @@ function createApp(options = {}) {
     });
 
     proc.on('close', (code) => {
+      if (!canRespond()) return;
+
       const trailingText = flushBuffer();
       const finalText = adapter.readFinal ? adapter.readFinal(invocation) : '';
 
@@ -188,7 +199,7 @@ function createApp(options = {}) {
         fullText = fullText ? `${fullText}${finalText}` : finalText;
       }
 
-      if (stream && trailingText) {
+      if (stream && trailingText && canRespond()) {
         const payload = {
           id: requestId,
           object: 'chat.completion.chunk',
@@ -199,7 +210,7 @@ function createApp(options = {}) {
         res.write(`data: ${JSON.stringify(payload)}\n\n`);
       }
 
-      if (stream && finalText) {
+      if (stream && finalText && canRespond()) {
         const payload = {
           id: requestId,
           object: 'chat.completion.chunk',
@@ -211,6 +222,7 @@ function createApp(options = {}) {
       }
 
       if (stream) {
+        if (!canRespond()) return;
         const donePayload = {
           id: requestId,
           object: 'chat.completion.chunk',
@@ -248,6 +260,8 @@ function createApp(options = {}) {
     });
 
     proc.on('error', (error) => {
+      if (!canRespond()) return;
+
       if (stream) {
         try {
           res.write('data: [DONE]\n\n');

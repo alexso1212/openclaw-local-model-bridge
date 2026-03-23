@@ -247,3 +247,66 @@ test('POST /v1/chat/completions streams Gemini responses as SSE', async () => {
     server.close();
   }
 });
+
+test('POST /v1/chat/completions does not crash if client aborts before the child exits', async () => {
+  const spawn = () => {
+    const proc = new EventEmitter();
+    proc.stdout = new PassThrough();
+    proc.stderr = new PassThrough();
+    proc.stdin = new PassThrough();
+    proc.killed = false;
+    proc.kill = () => {
+      proc.killed = true;
+      proc.emit('close', 130);
+    };
+
+    setTimeout(() => {
+      proc.stdout.end();
+      proc.emit('close', 130);
+    }, 30);
+
+    return proc;
+  };
+
+  const app = createApp({
+    config: {
+      defaultModel: 'claude-sonnet-4-5',
+      claudePath: '/bin/claude',
+      claudePermissionMode: 'acceptEdits',
+      geminiPath: '/bin/gemini'
+    },
+    detectProviders: () => ({}),
+    spawn
+  });
+  const server = await startServer(app);
+
+  try {
+    await new Promise((resolve, reject) => {
+      const address = server.address();
+      const req = http.request({
+        host: '127.0.0.1',
+        port: address.port,
+        path: '/v1/chat/completions',
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      req.on('error', () => resolve());
+      req.write(JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        messages: [{ role: 'user', content: 'Reply with only OK.' }]
+      }));
+      req.end();
+      setTimeout(() => {
+        req.destroy();
+        resolve();
+      }, 5);
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 80));
+    const response = await request(server, { method: 'GET', path: '/health' });
+
+    assert.equal(response.statusCode, 200);
+  } finally {
+    server.close();
+  }
+});

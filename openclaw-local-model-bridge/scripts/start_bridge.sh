@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+export PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+
 SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 RUNTIME_DIR="${HOME}/.openclaw/run/openclaw-local-model-bridge"
 PID_FILE="${RUNTIME_DIR}/bridge.pid"
